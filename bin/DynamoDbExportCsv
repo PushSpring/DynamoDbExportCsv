@@ -3,6 +3,7 @@
 
 var dynamoDbExport = require('../lib/DynamoDbExportCsv.js');
 var commander = require('commander');
+var fs = require('fs');
 
 commander.version('0.0.1')
     .option('-i, --awsid [awsid]', 'AWS Secret ID')
@@ -10,6 +11,9 @@ commander.version('0.0.1')
     .option('-r, --awsregion <awsregion>', 'AWS Region')
     .option('-t, --table <tableName>', 'Table to export')
     .option('-c, --columns <columns>', 'CSV list of columns')
+    .option('--filter-expression <filterExpression>', 'FilterExpression')
+    .option('--expression-attribute-values <expressionAttributeValues>', 'ExpressionAttributeValues')
+    .option('--expression-attribute-names <expressionAttributeNames>', 'ExpressionAttributeNames')
     .option('-b, --bucket [s3bucket]', 'Optional S3 Bucket to upload to')
     .option('-p, --path [s3path]', 'Optional s3 path')
     .option('-g, --gzip', 'Gzip output')
@@ -39,6 +43,32 @@ if (! commander.columns)
     console.error("You must specify a list of columns");
     commander.outputHelp();
     process.exit(1);
+}
+
+if (commander.filterExpression)
+{
+    if (commander.expressionAttributeValues)
+    {
+        try {
+            commander.expressionAttributeValues = loadFileOrJsonString(commander.expressionAttributeValues);
+        } catch (e) {
+            console.error("Providerd ExpressionAtributeValues is neither valid path or JSON");
+            console.error(e);
+            process.exit(1);
+        }
+        console.debug("Passed ExpressionAtributeValues");
+    }
+    if (commander.expressionAttributeNames)
+    {
+        try {
+            commander.expressionAttributeNames = loadFileOrJsonString(commander.expressionAttributeNames);
+        } catch (e) {
+            console.error("Providerd ExpressionAtributeNames is neither valid path or JSON");
+            console.error(e);
+            process.exit(1);
+        }
+        console.debug("Passed ExpressionAtributeNames");
+    }
 }
 
 var parallelScans = 1;
@@ -87,11 +117,28 @@ var finished = function(err) {
         process.exit(0);
     }
 
-}
+};
 
 if(commander.worker!==undefined) {
-    exporter.exportTableWorker(commander.table, columns, parallelScans, commander.worker, commander.gzip, commander.filesize, commander.bucket, commander.path, finished);
+    exporter.exportTableWorker(commander.table, columns, parallelScans, commander.worker, commander.gzip, commander.filesize, commander.bucket, commander.path, commander.filterExpression, commander.expressionAttributeValues, commander.expressionAttributeNames, finished);
 }
 else {
-    exporter.exportTable(commander.table, columns.join(','), parallelScans, commander.gzip, commander.filesize, commander.bucket, commander.path, finished);
+    exporter.exportTable(commander.table, columns.join(','), parallelScans, commander.gzip, commander.filesize, commander.bucket, commander.path, commander.filterExpression, commander.expressionAttributeValues, commander.expressionAttributeNames, finished);
+}
+
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function loadFileOrJsonString(input) {
+    var text = "";
+    if (IsJsonString(input)) text = input;
+    else text = fs.readFileSync(input, "utf8");
+
+    return JSON.stringify(JSON.parse(text));
 }

@@ -28,7 +28,7 @@ or streamed to S3.
 
 ### CLI tool
 ``` bash
-  $ ./bin/DynamoDBExportCSV --awsregion "us-west-2" --awsid "<id>" --awssecret "<secret>" --table "<mytable>" --columns "<columna,columnb,columnc>" --filter-expression ":culumna = :valuea" --expression-attribute-values ./attribute-values.json --expression-attribute-names ./attribute-names.json --gzip
+  $ ./bin/DynamoDBExportCSV --awsregion "us-west-2" --awsid "<id>" --awssecret "<secret>" --table "<mytable>" --columns "<columna,columnb,columnc>" --filter-expression ":culumna = :valuea" --expression-attribute-names ./attribute-names.json --expression-attribute-values ./attribute-values.json --gzip
 ```
 
 ### Library
@@ -59,7 +59,7 @@ __Arguments__
 * `awsSecretAccessKey` - AWS secret
 * `awsRegion` - AWS region
 
-### exportTable(table, columns, totalSegments, compressed, filesize, s3Bucket, s3Path, [filterExpression], [expressionAttributeValues], [expressionAttributeNames], callback)
+### exportTable(table, columns, totalSegments, compressed, filesize, s3Bucket, s3Path, [filterExpression], [expressionAttributeNames], [expressionAttributeValues], callback)
 
 Exports the specified columns in the dynamodb table to one or more files.  This method will spawn
 multiple child processes for each parallel scan.  This allows it to maximize performance by
@@ -81,11 +81,11 @@ created
 * `s3Path` - Optional. Key prefix for files in s3.  Used as a prefix with sequential numbers
 appended for each file created
 * `filterExpression` - Optional. FilterExpression for Scan query
-* `expressionAttributeValues` - Optional. Required when filterExpression is set, but may be null. ExpressionAttributeValues for FilterExpression
 * `expressionAttributeNames` - Optional. Required when filterExpression is set, but may be null. ExpressionAttributeNames for FilterExpression
+* `expressionAttributeValues` - Optional. Required when filterExpression is set, but may be null. ExpressionAttributeValues for FilterExpression
 * `callback(err)` - A callback which is executed when finished and includes any errors that occurred
 
-### exportTableWorker(table, columns, totalSegments, segment, compressed, filesize, s3Bucket, s3Path, [filterExpression], [expressionAttributeValues], [expressionAttributeNames], callback)
+### exportTableWorker(table, columns, totalSegments, segment, compressed, filesize, s3Bucket, s3Path, [filterExpression], [expressionAttributeNames], [expressionAttributeValues], callback)
 
 Exports one slice of a dynamodb table.  Used when running parallel scans.  If you use exportTable there
 is no reason to use this.  You might want to use it to break up a scan into chunks perhaps across machines
@@ -108,8 +108,8 @@ created
 * `s3Path` - Optional. Key prefix for files in s3.  Used as a prefix with sequential numbers
 appended for each file created
 * `filterExpression` - Optional. FilterExpression for Scan query
-* `expressionAttributeValues` - Optional. Required when filterExpression is set, but may be null. ExpressionAttributeValues for FilterExpression
 * `expressionAttributeNames` - Optional. Required when filterExpression is set, but may be null. ExpressionAttributeNames for FilterExpression
+* `expressionAttributeValues` - Optional. Required when filterExpression is set, but may be null. ExpressionAttributeValues for FilterExpression
 * `callback(err)` - A callback which is executed when finished and includes any errors that occurred
 
 

@@ -11,9 +11,9 @@ commander.version('0.0.1')
     .option('-r, --awsregion <awsregion>', 'AWS Region')
     .option('-t, --table <tableName>', 'Table to export')
     .option('-c, --columns <columns>', 'CSV list of columns')
-    .option('--filter-expression <filterExpression>', 'FilterExpression')
-    .option('--expression-attribute-values <expressionAttributeValues>', 'ExpressionAttributeValues')
-    .option('--expression-attribute-names <expressionAttributeNames>', 'ExpressionAttributeNames')
+    .option('--filter-expression <filterExpression>', 'FilterExpression. See AWS CLI\'s dynamodb scan for documentation')
+    .option('--expression-attribute-names <expressionAttributeNames>', 'ExpressionAttributeNames. See AWS CLI\'s dynamodb scan for documentation')
+    .option('--expression-attribute-values <expressionAttributeValues>', 'ExpressionAttributeValues. See AWS CLI\'s dynamodb scan for documentation')
     .option('-b, --bucket [s3bucket]', 'Optional S3 Bucket to upload to')
     .option('-p, --path [s3path]', 'Optional s3 path')
     .option('-g, --gzip', 'Gzip output')
@@ -47,17 +47,6 @@ if (! commander.columns)
 
 if (commander.filterExpression)
 {
-    if (commander.expressionAttributeValues)
-    {
-        try {
-            commander.expressionAttributeValues = loadFileOrJsonString(commander.expressionAttributeValues);
-        } catch (e) {
-            console.error("Providerd ExpressionAtributeValues is neither valid path or JSON");
-            console.error(e);
-            process.exit(1);
-        }
-        console.debug("Passed ExpressionAtributeValues");
-    }
     if (commander.expressionAttributeNames)
     {
         try {
@@ -67,7 +56,16 @@ if (commander.filterExpression)
             console.error(e);
             process.exit(1);
         }
-        console.debug("Passed ExpressionAtributeNames");
+    }
+    if (commander.expressionAttributeValues)
+    {
+        try {
+            commander.expressionAttributeValues = loadFileOrJsonString(commander.expressionAttributeValues);
+        } catch (e) {
+            console.error("Providerd ExpressionAtributeValues is neither valid path or JSON");
+            console.error(e);
+            process.exit(1);
+        }
     }
 }
 
@@ -120,10 +118,10 @@ var finished = function(err) {
 };
 
 if(commander.worker!==undefined) {
-    exporter.exportTableWorker(commander.table, columns, parallelScans, commander.worker, commander.gzip, commander.filesize, commander.bucket, commander.path, commander.filterExpression, commander.expressionAttributeValues, commander.expressionAttributeNames, finished);
+    exporter.exportTableWorker(commander.table, columns, parallelScans, commander.worker, commander.gzip, commander.filesize, commander.bucket, commander.path, commander.filterExpression, commander.expressionAttributeNames, commander.expressionAttributeValues, finished);
 }
 else {
-    exporter.exportTable(commander.table, columns.join(','), parallelScans, commander.gzip, commander.filesize, commander.bucket, commander.path, commander.filterExpression, commander.expressionAttributeValues, commander.expressionAttributeNames, finished);
+    exporter.exportTable(commander.table, columns.join(','), parallelScans, commander.gzip, commander.filesize, commander.bucket, commander.path, commander.filterExpression, commander.expressionAttributeNames, commander.expressionAttributeValues, finished);
 }
 
 function IsJsonString(str) {

@@ -17,7 +17,7 @@ commander.version('0.0.1')
     .option('-s, --scans [parallelscans]', 'Parallel scans to run - Defaults to 1', parseInt)
     .option('-w, --worker [scanindex]', 'Which portion of a parallel scan this worker will do - If specified will only scan this portion of table', parseInt)
     .option('-q, --quiet', 'Turn off progress information')
-    .option('-o, --awsoptions <awsoptions>', 'Additional options for AWS sub-apis')
+    .option('-o, --awsoptions <awsoptions>', 'Additional JSON String options object for AWS sub-APIs e.g. { "dynamodb": { "endpoint": "http://localhost:8000" } }')
     .parse(process.argv);
 
 if (!commander.table) {

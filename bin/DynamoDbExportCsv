@@ -17,68 +17,65 @@ commander.version('0.0.1')
     .option('-s, --scans [parallelscans]', 'Parallel scans to run - Defaults to 1', parseInt)
     .option('-w, --worker [scanindex]', 'Which portion of a parallel scan this worker will do - If specified will only scan this portion of table', parseInt)
     .option('-q, --quiet', 'Turn off progress information')
+    .option('-o, --awsoptions <awsoptions>', 'Additional options for AWS sub-apis')
     .parse(process.argv);
 
-if (! commander.table)
-{
+if (!commander.table) {
     console.error("You must specify a table");
     commander.outputHelp();
     process.exit(1);
 }
 
-if(! commander.awsregion)
-{
+if (!commander.awsregion) {
     console.error("You must specify an aws region");
     commander.outputHelp();
     process.exit(1);
 }
 
 
-if (! commander.columns)
-{
+if (!commander.columns) {
     console.error("You must specify a list of columns");
     commander.outputHelp();
     process.exit(1);
 }
 
 var parallelScans = 1;
-if (commander.scans)
-{
+if (commander.scans) {
     parallelScans = commander.scans;
 }
 
 var columns = commander.columns.split(',');
 
-if(commander.worker!==undefined) {
+if (commander.worker !== undefined) {
     console.info("Export DynamoDb table: " + commander.table + ", scan index: " + commander.worker);
 }
 else {
     console.info("Export DynamoDb table: " + commander.table + ", parallel scans: " + parallelScans);
 }
 
-var exporter = new dynamoDbExport(commander.awsid, commander.awssecret, commander.awsregion);
+var exporter = new dynamoDbExport(commander.awsid, commander.awssecret, commander.awsregion, commander.awsoptions);
 
-if(!commander.quiet) {
-exporter.on("info", function(message) {
-    console.info(message);
-});
+if (!commander.quiet) {
+    exporter.on("info", function (message) {
+        console.info(message);
+    });
 
-exporter.on("error", function(message) {
-    console.error(message);
-});
+    exporter.on("error", function (message) {
+        console.error(message);
+    });
 
-exporter.on("throughputexceeded", function() {
-    console.warn("Throughput exceeded");
-});
+    exporter.on("throughputexceeded", function () {
+        console.warn("Throughput exceeded");
+    });
 }
 
-var finished = function(err) {
+var finished = function (err) {
     var workerPrefix = "";
-    if(commander.worker!==undefined) {
+    if (commander.worker !== undefined) {
         workerPrefix = "Worker [" + commander.worker + "]: ";
     }
 
-    if(err) {
+    if (err) {
         console.error(workerPrefix + "Finished with errors: ", err);
         process.exit(1);
     }
@@ -89,7 +86,7 @@ var finished = function(err) {
 
 }
 
-if(commander.worker!==undefined) {
+if (commander.worker !== undefined) {
     exporter.exportTableWorker(commander.table, columns, parallelScans, commander.worker, commander.gzip, commander.filesize, commander.bucket, commander.path, finished);
 }
 else {

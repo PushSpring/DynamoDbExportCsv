@@ -49,15 +49,17 @@ Parallel Scans are useful to maximize usage of throughput provisioned on the Dyn
 
 ## Documentation
 
-### new DynamoDbExportToCSV(awsAccessKeyId, awsSecretAccessKey, awsRegion)
+### new DynamoDbExportToCSV(awsAccessKeyId, awsSecretAccessKey, awsRegion, awsOptions)
 
-Sets up the AWS credentials to use
+Sets up the AWS credentials to use. 
 
 __Arguments__
 
 * `awsAccessKeyId` - AWS access key
 * `awsSecretAccessKey` - AWS secret
 * `awsRegion` - AWS region
+* `awsOptions` - contains specific JSON string config options for each AWS sub-library e.g. DynamoDB will get instantiated with a config object of awsOptions.dynamodb passed as the constructor argument.
+
 
 ### exportTable(table, columns, totalSegments, compressed, filesize, s3Bucket, s3Path, callback)
 
